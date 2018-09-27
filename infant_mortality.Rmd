@@ -1,0 +1,125 @@
+---
+title: "Infant Mortality Annual Report - 2016"
+author: "Prepared by the Warren County Health District"
+date: "September 1, 2017"
+output:
+  word_document:
+    fig_height: 4.5
+    fig_width: 6
+    reference_docx: template/wchd-word-template.docx
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+graphics: yes
+link-citations: yes
+csl: template/american-journal-of-public-health.csl
+bibliography: template/bibliography.bib
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, cache = TRUE)
+
+year <- 2015
+county <- "Warren"
+state <- "OH"
+
+source("00_Setup.R")
+source("10_death.R")
+```
+
+<br>
+
+`r include_graphics("template/graphics/socioeconomic_small.png")`
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+`r include_graphics("template/graphics/logo.png")`
+
+\newline
+
+#### A report prepared to describe infant mortality in Warren County in 2016
+
+##### 
+
+# Introduction
+
+The Infant Mortality Report is part of an initiative to improve access to prenatal care, decrease infant mortality, and improve maternal and child health in Warren County. The risks to the health of mothers and their infants need to be identified and assessed in order to find solutions to improve and protect their short-term and long-term health.
+
+The data in this report is developed using data collected from the birth and death records of residents in Warren County. The data is deidentified and compiled to identify trends of concern and to identify areas of the data that require additional exploration and analysis.
+
+## Methods
+
+This report is generated using a series of datasets from various public and non-public datasets. These data have been accessed in the most raw version of data that is available or the data was retrieved from a web API. This ensures that analyses that are conducted are being done on the original data and are not calculations based on the calculations of others.
+
+All of the code for the generation of these reports is devleoped using the R Statistical Programming Language [@R-Project] and the R Studio IDE [@R-Studio]. The code used for the devleopment of this report is available on [GitHub](https://github.com/DustinRatliff/AnnualUpdate). A copy of this report will be maintained on the Warren County Health District [website](http://warrenchd.com/document-category/assessments).
+
+### Data Analysis
+
+The data that has been compiled is analyzed using multiple methodologies. Data is first assessed to identify what information can be found in the raw information. The data then goes through the following process [@Wickham2017] :
+
+`r include_graphics("template/graphics/data-science-explore.png")`
+
+Data is summarily analyzed at the inter-county and intra-county level to identify differences. These type of analysis allow an exploration of the county for sub-county data and identify areas that are more likely to have health disparities.
+
+### Data Sets
+
+The following data sets have been used to develop this analysis:
+
+  * 2016 Death Data File [@ODHDeath2016]
+  * 2016 Restricted Access Ohio Resident Live Births [@ODHBirth2016]
+
+### Indicators
+
+The following indicators will be part of the Infant Mortality Annual Report:
+
+  * Infant Mortality
+  * Preterm Birth
+  * Small for Gestational Age
+  * Pregnancy Spacing
+  * Maternal Smoking
+  * Prenatal Care
+  * Breastfeeding
+  * Safe Sleep
+
+# Infant Mortality
+
+Infant mortality is the death of an infant before their first birthday. [@CDC_InfMort] Infant mortality is an indicator of inequality in an area. (https://www.sciencedirect.com/science/article/abs/pii/S0014498311000234)
+
+$$ {Infant\;Mortality\;Rate} = \frac{{Number\;of\;Resident\;Infant\;Deaths}}{{Number\;of\;Resident\;Live\;Births}}\;{\times\;1,000}$$
+
+```{r }
+devtools::install_github('emitanaka/datalegreyar')
+library(datalegreyar)
+values <- 4+3 *1:20
+test <- fig(datafy(values, "Infant Mortality"), size=80)
+
+```
+
+
+### References
