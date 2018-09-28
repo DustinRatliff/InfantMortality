@@ -15,7 +15,6 @@ graphics: yes
 link-citations: yes
 csl: template/american-journal-of-public-health.csl
 bibliography: template/bibliography.bib
-
 ---
 
 ```{r setup, include=FALSE}
@@ -27,6 +26,7 @@ state <- "OH"
 
 source("00_Setup.R")
 source("10_death.R")
+source("11_birth.R")
 ```
 
 <br>
@@ -107,19 +107,235 @@ The following indicators will be part of the Infant Mortality Annual Report:
   * Breastfeeding
   * Safe Sleep
 
+#####
+
 # Infant Mortality
 
-Infant mortality is the death of an infant before their first birthday. [@CDC_InfMort] Infant mortality is an indicator of inequality in an area. (https://www.sciencedirect.com/science/article/abs/pii/S0014498311000234)
+Infant mortality is the death of an infant before their first birthday. [@CDC_InfMort] Infant mortality is an indicator of inequality in an area. 
 
-$$ {Infant\;Mortality\;Rate} = \frac{{Number\;of\;Resident\;Infant\;Deaths}}{{Number\;of\;Resident\;Live\;Births}}\;{\times\;1,000}$$
+$$ {Infant\;Mortality\;Rate} = \frac{{Number\;of\;Resident\;Infant\;Deaths\;<\;1\;Year\;Old}}{{Number\;of\;Resident\;Live\;Births}}\;{\times\;1,000}$$
 
-```{r }
-devtools::install_github('emitanaka/datalegreyar')
-library(datalegreyar)
-values <- 4+3 *1:20
-test <- fig(datafy(values, "Infant Mortality"), size=80)
+###### IMR in 2016: 5.3
+
+###### IMR in 2015: 4.2
+
+#### There has been a 26% INCREASE in IMR over the last year
+
+<br>
+
+```{r include=FALSE, cache = TRUE}
+infant_death_data <- list(deaths = c(16, 11, 24, 10, 21, 18, 17, 5, 7, 13, 12),
+                          births = c(2733, 2647, 2669, 2525, 2457, 2424, 2363, 2397, 2354, 2436, 2295),
+                          year = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)) %>%
+                      as_tibble %>%
+                      mutate(rate = deaths/births * 1000) %>%
+  mutate(year = as.character(year))
+
+infant_mortality_box <- waffle(c("Live Births" = 995,"Infant Deaths" = 5), rows=25, size=1)
+
+infant_mortality_graph <-
+infant_death_data %>% 
+    filter(year > 2007) %>%
+  filter(year < 2017) %>%
+  ggplot(aes(year, rate, group = 1)) + 
+  geom_text(aes(label= round(rate, digits = 1)), vjust=3, color="black", size=3.5) +
+  geom_line() +
+
+  ylim(0,10) +
+  labs(title = "Infant Mortality Rate in Warren County",
+subtitle = "Deaths per 1,000 Live Births") +
+theme(panel.background = element_blank()) +
+theme(axis.title.x = element_blank(),
+      #axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()) +
+    theme(axis.title.y = element_blank(),
+      #axis.text.y = element_blank(),
+      axis.ticks.y = element_blank()) 
+
+ggsave(
+  plot = infant_mortality_graph,
+  file = "charts/infant_mortality_graph.png",
+  width = 6,
+  height = 4.5,
+  type = "cairo-png"
+)
+
+infant_mortality_chart <-
+infant_death_data %>% 
+  filter(year > 2007) %>%
+  filter(year < 2017) %>%
+  ggplot(aes(x = year, y = rate)) + 
+
+   
+  geom_bar(stat="identity", fill="steelblue") +
+  geom_text(aes(label=deaths), hjust=2, color="white", size=3.5, angle = 90) +
+  labs(title = "Infant Deaths",
+       subtitle = "Warren County, Ohio") +
+theme(panel.background = element_blank()) +
+theme(axis.title.x = element_blank(),
+      #axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()) +
+    theme(axis.title.y = element_blank(),
+      #axis.text.y = element_blank(),
+      axis.ticks.y = element_blank()) 
+
+ggsave(
+  plot = infant_mortality_chart,
+  file = "charts/infant_mortality_chart.png",
+  width = 6,
+  height = 4.5,
+  type = "cairo-png"
+)
+
+birth_chart <-
+infant_death_data %>% 
+  filter(year > 2007) %>%
+  filter(year < 2017) %>%
+  ggplot(aes(x = year, y = births)) + 
+  geom_bar(stat="identity", fill="orange") +
+  geom_text(aes(label=births), hjust=2, color="white", size=3.5, angle = 90) +
+  labs(title = "Live Births",
+       subtitle = "Warren County, Ohio") +
+theme(panel.background = element_blank()) +
+theme(axis.title.x = element_blank(),
+      #axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()) +
+    theme(axis.title.y = element_blank(),
+      #axis.text.y = element_blank(),
+      axis.ticks.y = element_blank()) 
+
+infant_mortality_comb <- grid.arrange(infant_mortality_chart, 
+                                      birth_chart, 
+                                      infant_mortality_graph, 
+                                      widths = c(1,1),
+                                      layout_matrix = rbind(c(1,2),
+                                                            c(3, 3)))
+
+ggsave(
+  plot = infant_mortality_comb,
+  file = "charts/infant_mortality_comb.png",
+  width = 9,
+  height = 6,
+  type = "cairo-png"
+)
+
 
 ```
+
+`r include_graphics("charts/infant_mortality_comb.png")`
+
+##### 
+
+# Preterm Birth
+
+```{r include=FALSE}
+preterm_birth_chart <- preterm %>%
+  filter(`Birth Year` > 2014 & `Birth Year` < 2017) %>%
+  ggplot(aes(x = factor(1), y = pct, fill = term)) +
+  geom_bar(stat = "identity") +
+  facet_grid( ~ `Birth Year`) +
+  coord_polar(theta = "y", start = 0) +
+  #geom_text(aes(label=count), hjust=2, color="white", size=3.5, angle = 90) +
+  scale_fill_viridis(discrete = TRUE, option = "E") +
+  labs(title = "Percentage of Births That Are Preterm",
+  subtitle = "Warren County, Ohio") +
+  theme(panel.background = element_blank()) +
+  theme(
+  axis.title.x = element_blank(),
+  axis.text.x = element_blank(),
+  axis.ticks.x = element_blank()
+  ) +
+  theme(
+  axis.title.y = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.y = element_blank()
+  )
+  
+  preterm_birth_breakdown_chart <- birth %>%
+  filter(`Residence County` == "Warren") %>%
+  select(`Birth Year`, Gestation) %>%
+  mutate(term = ifelse(
+  Gestation < 23,
+  "Less than 23 Weeks Gestation Birth",
+  ifelse(
+  Gestation >= 23 & Gestation < 32,
+  "Very-Preterm Birth",
+  ifelse(
+  Gestation >= 23 &
+  Gestation < 37,
+  "Preterm Birth",
+  "Normal Term Birth"
+  )
+  )
+  )) %>%
+  
+  mutate(term = factor(
+  term,
+  levels = c(
+  "Less than 23 Weeks Gestation Birth",
+  "Very-Preterm Birth",
+  "Preterm Birth",
+  "Normal Term Birth"
+  )
+  ))   %>%
+  filter(term != "Normal Term Birth") %>%
+  group_by(`Birth Year`, term) %>%
+  summarise(count = n()) %>%
+  mutate(freq = count / sum(count)) %>%
+  mutate(pct = freq * 100) %>%
+  
+  
+  
+  filter(`Birth Year` > 2014 & `Birth Year` < 2017) %>%
+  ggplot(aes(x = factor(1), y = pct, fill = term)) +
+  
+  
+  geom_bar(stat = "identity") +
+  facet_grid( ~ `Birth Year`) +
+  coord_polar(theta = "y", start = 0) +
+  #geom_text(aes(label=count), hjust=2, color="white", size=3.5, angle = 90) +
+  scale_fill_viridis(discrete = TRUE, option = "E", direction = -1) +
+  labs(title = "Breakdown of Preterm Births",
+  subtitle = "Warren County, Ohio") +
+  theme(panel.background = element_blank()) +
+  theme(
+  axis.title.x = element_blank(),
+  axis.text.x = element_blank(),
+  axis.ticks.x = element_blank()
+  ) +
+  theme(
+  axis.title.y = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.y = element_blank()
+  )
+
+preterm_comb <- grid.arrange(preterm_birth_chart, preterm_birth_breakdown_chart, ncol=1)
+
+ggsave(
+  plot = preterm_comb,
+  file = "charts/preterm_comb.png",
+  width = 9,
+  height = 7,
+  type = "cairo-png"
+)
+
+
+
+```
+
+#### Preterm Births are infants born before 37 weeks gestation
+#### Very-Preterm Births are infants born before 32 weeks of gestation
+#### Less than 23 Weeks births are infants born before 23 week of gestation
+
+###### 250 preterm babies were born in Warren County in 2016
+
+#### There was a 8.7% increase in the number of preterm births between 2015 and 2016
+
+`r include_graphics("charts/preterm_comb.png")`
+
+#####
+
+# Small for Gestational Age
 
 
 ### References

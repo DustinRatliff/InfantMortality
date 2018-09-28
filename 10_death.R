@@ -1,3 +1,9 @@
+# devtools::install_github('emitanaka/datalegreyar')
+# library(datalegreyar)
+# values <- c(11, 24, 10, 21, 18, 17, 5, 7, 12 )
+# fig(datafy(values, "Mortality"), size=80)
+
+
 # Import----
 
 death_2017 <- read_csv("data/death/deaths2017prelim.csv") %>%
