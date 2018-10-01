@@ -1,6 +1,6 @@
 ---
 title: "Infant Mortality Annual Report - 2016"
-author: "Prepared by the Warren County Health District"
+author: "Prepared by Dustin Ratliff, MPH, of the Warren County Health District"
 date: "September 1, 2017"
 output:
   word_document:
@@ -20,7 +20,7 @@ bibliography: template/bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, cache = TRUE)
 
-year <- 2015
+year <- 2016
 county <- "Warren"
 state <- "OH"
 
@@ -100,8 +100,7 @@ The following indicators will be part of the Infant Mortality Annual Report:
 
   * Infant Mortality
   * Preterm Birth
-  * Small for Gestational Age
-  * Pregnancy Spacing
+  * Low Birth Weight
   * Maternal Smoking
   * Prenatal Care
   * Breastfeeding
@@ -327,7 +326,7 @@ ggsave(
 #### Very-Preterm Births are infants born before 32 weeks of gestation
 #### Less than 23 Weeks births are infants born before 23 week of gestation
 
-###### 250 preterm babies were born in Warren County in 2016
+###### 250 preterm babies were born 2016
 
 #### There was a 8.7% increase in the number of preterm births between 2015 and 2016
 
@@ -335,7 +334,87 @@ ggsave(
 
 #####
 
-# Small for Gestational Age
+# Low Birth Weight
 
+Babies with a birthweight of less than 5 pounds, 8 ounces (2,500 grams) are considered to have a low birth weight. Low birth weight is primarily caused by premature birth. Babies with a low birth weight can face multiple challenges including having trouble keeping their bodies at the right temperature, having trouble breathing, nad difficulty feeding and gaining weight.
+
+###### 171 babies had a low birthweight in 2016
+
+```{r include=FALSE}
+low_birth <- birth %>%
+  filter(`Birth Year` > 2014 & `Birth Year` < 2017) %>%
+  select(`Birth Year`, `Low Birth Weight Indicator`, `Birth Weight`) %>%
+  filter(`Low Birth Weight Indicator` != "Unknown") %>%
+  group_by(`Birth Year`, `Low Birth Weight Indicator`) %>%
+  summarise(Count = n())
+
+low_birth <- low_birth %>%
+  ggplot(aes(x = as.character(`Birth Year`), y = Count, group = `Low Birth Weight Indicator`, fill = `Low Birth Weight Indicator`)) +
+           geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label=Count), vjust=1.5, color="white", size=5, position = position_dodge(width=.9)) +
+  theme_minimal() +
+  theme(
+  axis.title.x = element_blank()
+  #axis.text.x = element_blank(),
+  #axis.ticks.x = element_blank()
+  ) +
+  theme(
+  #axis.title.y = element_blank(),
+  #axis.text.y = element_blank(),
+  #axis.ticks.y = element_blank()
+  ) +
+  labs(title = "Babies with a Low Birth Weight",
+  subtitle = "Warren County, Ohio")
+
+ggsave(
+  plot = low_birth,
+  file = "charts/low_birth.png",
+  width = 6,
+  height = 4.5,
+  type = "cairo-png"
+)
+
+```
+
+`r include_graphics("charts/low_birth.png")`
+
+#### 7.0% of babies born in 2016 had a low birthweight compared to 7.2% in 2015
+#### There was a 2.8% decrease in the percentage of babies that had a low birth weight between 2015 and 2016
+
+#####
+
+# Maternal Smoking
+
+Tobacco use can be harmful to a developing baby and the mother. Maternal smoking is the percent of mothers who smoked during the second or third trimester
+
+```{r}
+maternal_smoking <- birth %>%
+  mutate(smoked = ifelse(`Smoked Second Trimester` == "Y", "Y", "N"))
+
+  
+  filter(`Smoked Second Trimester` == "Y" | `Smoked Last Trimester` == "Y") %>%
+  filter(`Birth Year` > 2011 & `Birth Year` < 2017) %>%
+  
+  
+  ggplot(aes(year, rate, group = 1)) + 
+  geom_text(aes(label= round(rate, digits = 1)), vjust=3, color="black", size=3.5) +
+  geom_line() +
+
+  ylim(0,10) +
+  labs(title = "Infant Mortality Rate in Warren County",
+subtitle = "Deaths per 1,000 Live Births") +
+theme(panel.background = element_blank()) +
+theme(axis.title.x = element_blank(),
+      #axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()) +
+    theme(axis.title.y = element_blank(),
+      #axis.text.y = element_blank(),
+      axis.ticks.y = element_blank()) 
+  
+  
+
+
+```
+#####
 
 ### References

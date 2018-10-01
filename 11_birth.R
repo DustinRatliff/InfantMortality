@@ -2,6 +2,16 @@
 
 birth <- read_csv("data/birth/RestrictedOhioLiveBirths_Export.csv")
 
+# birth2 <- birth %>%
+#   str_replace_all("99", NA)
+#     
+#     "99" = "NA",
+#     "Unknown" = "NA",
+#     "Unknown/Not Reported" = "NA"
+#   ))
+
+
+
 birth_total <- birth %>%
   filter(`Birth Year` == 2016) %>%
   filter(`Residence County` == "Warren") %>%
@@ -24,4 +34,3 @@ preterm <- birth %>%
   summarise(count = n()) %>%
   mutate(freq = count / sum(count)) %>%
   mutate(pct = freq * 100)
-
