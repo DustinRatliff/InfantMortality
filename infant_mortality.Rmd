@@ -1,7 +1,7 @@
 ---
-title: "Infant Mortality Annual Report - 2016"
+title: "Maternal and Infant Health Annual Report - 2016"
 author: "Prepared by Dustin Ratliff, MPH, of the Warren County Health District"
-date: "September 1, 2017"
+date: "October 2, 2018"
 output:
   word_document:
     fig_height: 4.5
@@ -69,23 +69,44 @@ source("11_birth.R")
 
 # Introduction
 
-The Infant Mortality Report is part of an initiative to improve access to prenatal care, decrease infant mortality, and improve maternal and child health in Warren County. The risks to the health of mothers and their infants need to be identified and assessed in order to find solutions to improve and protect their short-term and long-term health.
+The Maternal and Infant Health Report - 2016 is part of an initiative to improve
+access to prenatal care, decrease infant mortality, and improve maternal and
+child health in Warren County. The risks to the health of mothers and their
+infants need to be identified and assessed in order to find solutions to improve
+and protect their short-term and long-term health.
 
-The data in this report is developed using data collected from the birth and death records of residents in Warren County. The data is deidentified and compiled to identify trends of concern and to identify areas of the data that require additional exploration and analysis.
+The data in this report is developed using data collected from the birth and
+death records of residents in Warren County in 2016. The data is deidentified
+and compiled to identify trends of concern and to identify areas of the data
+that require additional exploration and analysis.
 
 ## Methods
 
-This report is generated using a series of datasets from various public and non-public datasets. These data have been accessed in the most raw version of data that is available or the data was retrieved from a web API. This ensures that analyses that are conducted are being done on the original data and are not calculations based on the calculations of others.
+This report is generated using a series of datasets from various public and
+non-public datasets. These data have been accessed in the most raw version of
+data that is available or the data was retrieved from a web API. This ensures
+that analyses that are conducted are being done on the original data and are not
+calculations based on the calculations of others.
 
-All of the code for the generation of these reports is devleoped using the R Statistical Programming Language [@R-Project] and the R Studio IDE [@R-Studio]. The code used for the devleopment of this report is available on [GitHub](https://github.com/DustinRatliff/AnnualUpdate). A copy of this report will be maintained on the Warren County Health District [website](http://warrenchd.com/document-category/assessments).
+All of the code for the generation of these reports is devleoped using the R
+Statistical Programming Language [@R-Project] and the R Studio IDE [@R-Studio].
+The code used for the devleopment of this report is available on
+[GitHub](https://github.com/DustinRatliff/AnnualUpdate). A copy of this report
+will be maintained on the Warren County Health District
+[website](http://warrenchd.com/document-category/assessments).
 
 ### Data Analysis
 
-The data that has been compiled is analyzed using multiple methodologies. Data is first assessed to identify what information can be found in the raw information. The data then goes through the following process [@Wickham2017] :
+The data that has been compiled is analyzed using multiple methodologies. Data
+is first assessed to identify what information can be found in the raw
+information. The data then goes through the following process [@Wickham2017] :
 
 `r include_graphics("template/graphics/data-science-explore.png")`
 
-Data is summarily analyzed at the inter-county and intra-county level to identify differences. These type of analysis allow an exploration of the county for sub-county data and identify areas that are more likely to have health disparities.
+Data is summarily analyzed at the inter-county and intra-county level to
+identify differences. These type of analysis allow an exploration of the county
+for sub-county data and identify areas that are more likely to have health
+disparities.
 
 ### Data Sets
 
@@ -94,25 +115,16 @@ The following data sets have been used to develop this analysis:
   * 2016 Death Data File [@ODHDeath2016]
   * 2016 Restricted Access Ohio Resident Live Births [@ODHBirth2016]
 
-### Indicators
-
-The following indicators will be part of the Infant Mortality Annual Report:
-
-  * Infant Mortality
-  * Preterm Birth
-  * Low Birth Weight
-  * Maternal Smoking
-  * Prenatal Care
-  * Breastfeeding
-  * Safe Sleep
-
 #####
 
 # Infant Mortality
 
-Infant mortality is the death of an infant before their first birthday. [@CDC_InfMort] Infant mortality is an indicator of inequality in an area. 
+Infant mortality is the death of an infant before their first birthday.
+[@CDC_InfMort] Infant mortality is an indicator of inequality in an area.
 
-$$ {Infant\;Mortality\;Rate} = \frac{{Number\;of\;Resident\;Infant\;Deaths\;<\;1\;Year\;Old}}{{Number\;of\;Resident\;Live\;Births}}\;{\times\;1,000}$$
+$$ {Infant\;Mortality\;Rate} =
+\frac{{Number\;of\;Resident\;Infant\;Deaths\;<\;1\;Year\;Old}}
+{{Number\;of\;Resident\;Live\;Births}}\;{\times\;1,000}$$
 
 ###### IMR in 2016: 5.3
 
@@ -122,34 +134,41 @@ $$ {Infant\;Mortality\;Rate} = \frac{{Number\;of\;Resident\;Infant\;Deaths\;<\;1
 
 <br>
 
-```{r include=FALSE, cache = TRUE}
+```{r mortality, include=FALSE, cache = TRUE}
 infant_death_data <- list(deaths = c(16, 11, 24, 10, 21, 18, 17, 5, 7, 13, 12),
-                          births = c(2733, 2647, 2669, 2525, 2457, 2424, 2363, 2397, 2354, 2436, 2295),
-                          year = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)) %>%
+                          births = c(2733, 2647, 2669, 2525, 2457, 2424, 
+                                     2363, 2397, 2354, 2436, 2295),
+                          year = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 
+                                   2014, 2015, 2016, 2017)) %>%
                       as_tibble %>%
                       mutate(rate = deaths/births * 1000) %>%
-  mutate(year = as.character(year))
+                      mutate(year = as.character(year))
 
-infant_mortality_box <- waffle(c("Live Births" = 995,"Infant Deaths" = 5), rows=25, size=1)
+infant_mortality_box <- waffle(c("Live Births" = 995,"Infant Deaths" = 5), 
+                               rows=25, size=1)
 
-infant_mortality_graph <-
-infant_death_data %>% 
-    filter(year > 2007) %>%
+infant_mortality_graph <-infant_death_data %>% 
+  filter(year > 2007) %>%
   filter(year < 2017) %>%
   ggplot(aes(year, rate, group = 1)) + 
-  geom_text(aes(label= round(rate, digits = 1)), vjust=3, color="black", size=3.5) +
+  geom_text(aes(label= round(rate, digits = 1)), 
+            vjust=3, color="black", size=3.5) +
   geom_line() +
-
+  stat_smooth(method = "lm", 
+              geom='line', 
+              alpha=0.5, 
+              colour = "steelblue", 
+              se=TRUE) +
   ylim(0,10) +
   labs(title = "Infant Mortality Rate in Warren County",
-subtitle = "Deaths per 1,000 Live Births") +
-theme(panel.background = element_blank()) +
-theme(axis.title.x = element_blank(),
-      #axis.text.x = element_blank(),
-      axis.ticks.x = element_blank()) +
-    theme(axis.title.y = element_blank(),
-      #axis.text.y = element_blank(),
-      axis.ticks.y = element_blank()) 
+      subtitle = "Deaths per 1,000 Live Births",
+      y = "Rate"
+      ) +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank())
 
 ggsave(
   plot = infant_mortality_graph,
@@ -159,24 +178,20 @@ ggsave(
   type = "cairo-png"
 )
 
-infant_mortality_chart <-
-infant_death_data %>% 
+infant_mortality_chart <- infant_death_data %>% 
   filter(year > 2007) %>%
   filter(year < 2017) %>%
   ggplot(aes(x = year, y = rate)) + 
-
-   
   geom_bar(stat="identity", fill="steelblue") +
-  geom_text(aes(label=deaths), hjust=2, color="white", size=3.5, angle = 90) +
+  geom_text(aes(label=deaths), hjust=2, 
+            color="white", size=3.5, angle = 90) +
   labs(title = "Infant Deaths",
        subtitle = "Warren County, Ohio") +
-theme(panel.background = element_blank()) +
-theme(axis.title.x = element_blank(),
-      #axis.text.x = element_blank(),
-      axis.ticks.x = element_blank()) +
-    theme(axis.title.y = element_blank(),
-      #axis.text.y = element_blank(),
-      axis.ticks.y = element_blank()) 
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank()) 
 
 ggsave(
   plot = infant_mortality_chart,
@@ -195,13 +210,11 @@ infant_death_data %>%
   geom_text(aes(label=births), hjust=2, color="white", size=3.5, angle = 90) +
   labs(title = "Live Births",
        subtitle = "Warren County, Ohio") +
-theme(panel.background = element_blank()) +
-theme(axis.title.x = element_blank(),
-      #axis.text.x = element_blank(),
-      axis.ticks.x = element_blank()) +
-    theme(axis.title.y = element_blank(),
-      #axis.text.y = element_blank(),
-      axis.ticks.y = element_blank()) 
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank())  
 
 infant_mortality_comb <- grid.arrange(infant_mortality_chart, 
                                       birth_chart, 
@@ -227,7 +240,14 @@ ggsave(
 
 # Preterm Birth
 
-```{r include=FALSE}
+Preterm birth is a significant risk factor for infant mortality and many other 
+negative health outcomes. 
+
+Preterm Births are infants born before 37 weeks gestation. Very-Preterm Births 
+are infants born before 32 weeks of gestation. Less than 23 Weeks births are 
+infants born before 23 week of gestation.
+
+```{r preterm, include=FALSE}
 preterm_birth_chart <- preterm %>%
   filter(`Birth Year` > 2014 & `Birth Year` < 2017) %>%
   ggplot(aes(x = factor(1), y = pct, fill = term)) +
@@ -238,16 +258,13 @@ preterm_birth_chart <- preterm %>%
   scale_fill_viridis(discrete = TRUE, option = "E") +
   labs(title = "Percentage of Births That Are Preterm",
   subtitle = "Warren County, Ohio") +
-  theme(panel.background = element_blank()) +
-  theme(
-  axis.title.x = element_blank(),
-  axis.text.x = element_blank(),
-  axis.ticks.x = element_blank()
-  ) +
-  theme(
-  axis.title.y = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks.y = element_blank()
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()
   )
   
   preterm_birth_breakdown_chart <- birth %>%
@@ -292,23 +309,20 @@ preterm_birth_chart <- preterm %>%
   geom_bar(stat = "identity") +
   facet_grid( ~ `Birth Year`) +
   coord_polar(theta = "y", start = 0) +
-  #geom_text(aes(label=count), hjust=2, color="white", size=3.5, angle = 90) +
   scale_fill_viridis(discrete = TRUE, option = "E", direction = -1) +
   labs(title = "Breakdown of Preterm Births",
   subtitle = "Warren County, Ohio") +
-  theme(panel.background = element_blank()) +
-  theme(
-  axis.title.x = element_blank(),
-  axis.text.x = element_blank(),
-  axis.ticks.x = element_blank()
-  ) +
-  theme(
-  axis.title.y = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks.y = element_blank()
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()
   )
 
-preterm_comb <- grid.arrange(preterm_birth_chart, preterm_birth_breakdown_chart, ncol=1)
+preterm_comb <- grid.arrange(preterm_birth_chart, 
+                             preterm_birth_breakdown_chart, ncol=1)
 
 ggsave(
   plot = preterm_comb,
@@ -322,57 +336,63 @@ ggsave(
 
 ```
 
-#### Preterm Births are infants born before 37 weeks gestation
-#### Very-Preterm Births are infants born before 32 weeks of gestation
-#### Less than 23 Weeks births are infants born before 23 week of gestation
+
 
 ###### 250 preterm babies were born 2016
 
-#### There was a 8.7% increase in the number of preterm births between 2015 and 2016
-
 `r include_graphics("charts/preterm_comb.png")`
+
+#### There was a 8.7% increase in the number of preterm births between 2015 and 2016
 
 #####
 
 # Low Birth Weight
 
-Babies with a birthweight of less than 5 pounds, 8 ounces (2,500 grams) are considered to have a low birth weight. Low birth weight is primarily caused by premature birth. Babies with a low birth weight can face multiple challenges including having trouble keeping their bodies at the right temperature, having trouble breathing, nad difficulty feeding and gaining weight.
+Babies with a birthweight of less than 5 pounds, 8 ounces (2,500 grams) are
+considered to have a low birth weight. Low birth weight is primarily caused by
+premature birth. Babies with a low birth weight can face multiple challenges
+including having trouble keeping their bodies at the right temperature, having
+trouble breathing, nad difficulty feeding and gaining weight.
 
 ###### 171 babies had a low birthweight in 2016
 
-```{r include=FALSE}
+```{r birth weight, include=FALSE}
 low_birth <- birth %>%
   filter(`Birth Year` > 2014 & `Birth Year` < 2017) %>%
   select(`Birth Year`, `Low Birth Weight Indicator`, `Birth Weight`) %>%
   filter(`Low Birth Weight Indicator` != "Unknown") %>%
   group_by(`Birth Year`, `Low Birth Weight Indicator`) %>%
   summarise(Count = n())
-
-low_birth <- low_birth %>%
-  ggplot(aes(x = as.character(`Birth Year`), y = Count, group = `Low Birth Weight Indicator`, fill = `Low Birth Weight Indicator`)) +
-           geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label=Count), vjust=1.5, color="white", size=5, position = position_dodge(width=.9)) +
+  
+  low_birth <- low_birth %>%
+  ggplot(
+  aes(
+  x = as.character(`Birth Year`),
+  y = Count,
+  group = `Low Birth Weight Indicator`,
+  fill = `Low Birth Weight Indicator`
+  )
+  ) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(
+  aes(label = Count),
+  vjust = 1.5,
+  color = "white",
+  size = 5,
+  position = position_dodge(width = .9)
+  ) +
   theme_minimal() +
-  theme(
-  axis.title.x = element_blank()
-  #axis.text.x = element_blank(),
-  #axis.ticks.x = element_blank()
-  ) +
-  theme(
-  #axis.title.y = element_blank(),
-  #axis.text.y = element_blank(),
-  #axis.ticks.y = element_blank()
-  ) +
+  theme(axis.title.x = element_blank()) +
   labs(title = "Babies with a Low Birth Weight",
   subtitle = "Warren County, Ohio")
-
-ggsave(
+  
+  ggsave(
   plot = low_birth,
   file = "charts/low_birth.png",
   width = 6,
   height = 4.5,
   type = "cairo-png"
-)
+  )
 
 ```
 
@@ -385,36 +405,140 @@ ggsave(
 
 # Maternal Smoking
 
-Tobacco use can be harmful to a developing baby and the mother. Maternal smoking is the percent of mothers who smoked during the second or third trimester
+Tobacco use can be harmful to a developing baby and the mother. Maternal smoking
+is the percent of mothers who smoked during the second or third trimester.
 
-```{r}
+###### Only 6.7% of Pregnant Women Smoked in 2016
+
+```{r smoking, include = FALSE}
 maternal_smoking <- birth %>%
-  mutate(smoked = ifelse(`Smoked Second Trimester` == "Y", "Y", "N"))
+mutate(smoked = ifelse(
+  `Smoked Second Trimester` == "Y" |
+  `Smoked Second Trimester` == "Y",
+  "Smoked During Pregnancy",
+  ifelse(
+  `Smoked Second Trimester` == "U" |
+  `Smoked Second Trimester` == "U",
+  NA,
+  "Did Not Smoke During Pregnancy"
+  )
+  )) %>%
+  group_by(`Birth Year`, smoked) %>%
+  summarise(Count = n()) %>%
+  na.omit() %>%
+  mutate(Percentage = Count/sum(Count) * 100) %>%
+  mutate(Percentage = round(Percentage, digits = 1))
 
-  
-  filter(`Smoked Second Trimester` == "Y" | `Smoked Last Trimester` == "Y") %>%
-  filter(`Birth Year` > 2011 & `Birth Year` < 2017) %>%
-  
-  
-  ggplot(aes(year, rate, group = 1)) + 
-  geom_text(aes(label= round(rate, digits = 1)), vjust=3, color="black", size=3.5) +
-  geom_line() +
+maternal_smoking_graph <- maternal_smoking %>% 
+  filter(smoked == "Smoked During Pregnancy") %>% 
+  filter (`Birth Year` < 2017) %>%
 
-  ylim(0,10) +
-  labs(title = "Infant Mortality Rate in Warren County",
-subtitle = "Deaths per 1,000 Live Births") +
-theme(panel.background = element_blank()) +
-theme(axis.title.x = element_blank(),
-      #axis.text.x = element_blank(),
-      axis.ticks.x = element_blank()) +
-    theme(axis.title.y = element_blank(),
-      #axis.text.y = element_blank(),
-      axis.ticks.y = element_blank()) 
-  
-  
+  ggplot(aes(x = as.character(`Birth Year`),
+             y = Percentage,
+             group = 1)) +
+  geom_text(aes(label= Percentage), 
+            vjust=3, 
+            color="black", 
+            size=3.5) +
+  stat_smooth(method = "lm", 
+              geom='line', 
+              alpha=0.5, 
+              colour = "steelblue", 
+              se=TRUE) +
+  geom_line() + 
+  ylim(0, 12) +
+  labs(title = "Maternal Smoking Rate in Warren County",
+        subtitle = "Percentage of Women Who Smoked in 2nd or 3rd Trimester") +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank())
 
+
+ggsave(
+  plot = maternal_smoking_graph,
+  file = "charts/maternal_smoking_graph.png",
+  width = 6,
+  height = 4.5,
+  type = "cairo-png"
+)
+  
 
 ```
+
+`r include_graphics("charts/maternal_smoking_graph.png")`
+
+#### The percentage of women that smoke during pregnancy has been steadily declining since 2006.
+
+#### The percentage of women who smoke during pregnancy dropped by a third between 2006 and 2016
+
+#####
+
+# Prenatal Care
+
+A healthy birth is supported by a health pregnancy. Prenatal care improves the 
+chances of a healthy pregnancy. Early prenatal care access is the percentage of 
+mothers that receive prenatal care in the first trimester of their pregnancy.
+
+###### 75.8% of pregnant women received care in 2016
+
+```{r prenatal, include = FALSE}
+prenatal <- birth %>%
+  filter(`Residence County` == "Warren") %>%
+  mutate(prenatal = 
+           ifelse(`Month Prenatal Care Began` == "Unknown", NA,
+                  ifelse(`Month Prenatal Care Began` < 4, 
+                         "Prenatal Care Before First Trimester",
+                         "Prenatal Care After First Trimester or No Care"))) %>%
+  group_by(`Birth Year`, prenatal) %>%
+  summarise(Count = n()) %>%
+  na.omit() %>%
+  mutate(Percentage = Count/sum(Count) * 100) %>%
+  mutate(Percentage = round(Percentage, digits = 1)) 
+
+prenatal_graph <- prenatal %>% 
+  filter(prenatal == "Prenatal Care Before First Trimester") %>% 
+  filter (`Birth Year` < 2017) %>%
+
+  ggplot(aes(x = as.character(`Birth Year`),
+             y = Percentage,
+             group = 1)) +
+    geom_line() + 
+  geom_text(aes(label= Percentage), 
+            vjust=3, 
+            color="black", 
+            size=3.5) +
+  stat_smooth(method = "lm", 
+              geom='line', 
+              alpha=0.5, 
+              colour = "steelblue", 
+              se=TRUE) +
+
+  ylim(0, 100) +
+  labs(title = "Access to Prenatal Care",
+        subtitle = "Percentage of Women Who Received Prenatal Care in 1st Trimester") +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank())
+
+
+ggsave(
+  plot = prenatal_graph,
+  file = "charts/prenatal_graph.png",
+  width = 6,
+  height = 4.5,
+  type = "cairo-png"
+)
+
+```
+
+`r include_graphics("charts/maternal_smoking_graph.png")`
+
+#### The percentage of women who received prenatal care in the first trimester increased by 1.3% from 2015 to 2016
+
 #####
 
 ### References
