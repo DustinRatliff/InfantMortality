@@ -35,7 +35,31 @@ preterm <- birth %>%
   group_by(`Birth Year`, term) %>%
   summarise(count = n()) %>%
   mutate(freq = count / sum(count)) %>%
+  mutate(pct = freq * 100) %>%
+  mutate(preterm = 
+           ifelse(term == "Less than 23 Weeks Gestation Birth" |
+                  term == "Very-Preterm Birth" |
+                  term == "Preterm", 
+                  "Preterm",
+                  "Normal Term Birth")) %>%
+  ungroup() %>%
+  group_by(`Birth Year`)
+
+preterm_gen <- birth %>%
+  filter(`Residence County` == "Warren") %>%
+  select(`Birth Year`, Gestation) %>%
+  mutate(term = 
+           ifelse(Gestation < 37, 
+                  "Preterm Birth",
+                  "Normal Term Birth")) %>%
+  
+  mutate(term = factor(term, levels = c("Preterm Birth",
+                                        "Normal Term Birth")))   %>%
+  group_by(`Birth Year`, term) %>%
+  summarise(count = n()) %>%
+  mutate(freq = count / sum(count)) %>%
   mutate(pct = freq * 100)
+
 
 prenatal <- birth %>%
   filter(`Residence County` == "Warren") %>%
@@ -49,3 +73,4 @@ prenatal <- birth %>%
   mutate(Percentage = Count/sum(Count) * 100) %>%
   mutate(Percentage = round(Percentage, digits = 1))
   
+
